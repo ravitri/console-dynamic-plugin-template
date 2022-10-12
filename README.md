@@ -24,10 +24,10 @@ plugin name in the `consolePlugin` declaration of [package.json](package.json).
 
 ```json
 "consolePlugin": {
-  "name": "my-plugin",
+  "name": "console-dynamic-plugin-template",
   "version": "0.0.1",
-  "displayName": "My Plugin",
-  "description": "Enjoy this shiny, new console plugin!",
+  "displayName": "OpenShift Console Dynamic Plugin Template",
+  "description": "Minimal Console Dynamic Plugin",
   "exposedModules": {
     "ExamplePage": "./components/ExamplePage"
   },
@@ -63,42 +63,6 @@ This will run the OpenShift console in a container connected to the cluster
 you've logged into. The plugin HTTP server runs on port 9001 with CORS enabled.
 Navigate to <http://localhost:9000/example> to see the running plugin.
 
-#### Running start-console with Apple silicon and podman
-
-If you are using podman on a Mac with Apple silicon, `yarn run start-console`
-might fail since it runs an amd64 image. You can workaround the problem with
-[qemu-user-static](https://github.com/multiarch/qemu-user-static) by running
-these commands:
-
-```bash
-podman machine ssh
-sudo -i
-rpm-ostree install qemu-user-static
-systemctl reboot
-```
-
-### Option 2: Docker + VSCode Remote Container
-
-Make sure the
-[Remote Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-extension is installed. This method uses Docker Compose where one container is
-the OpenShift console and the second container is the plugin. It requires that
-you have access to an existing OpenShift cluster. After the initial build, the
-cached containers will help you start developing in seconds.
-
-1. Create a `dev.env` file inside the `.devcontainer` folder with the correct values for your cluster:
-
-```bash
-OC_PLUGIN_NAME=my-plugin
-OC_URL=https://api.example.com:6443
-OC_USER=kubeadmin
-OC_PASS=<password>
-```
-
-2. `(Ctrl+Shift+P) => Remote Containers: Open Folder in Container...`
-3. `yarn run start`
-4. Navigate to <http://localhost:9000/example>
-
 ## Docker image
 
 Before you can deploy your plugin on a cluster, you must build an image and
@@ -107,44 +71,28 @@ push it to an image registry.
 1. Build the image:
 
    ```sh
-   docker build -t quay.io/my-repositroy/my-plugin:latest .
+   make build
    ```
 
 2. Run the image:
 
    ```sh
-   docker run -it --rm -d -p 9001:80 quay.io/my-repository/my-plugin:latest
+   make run
    ```
 
 3. Push the image:
 
    ```sh
-   docker push quay.io/my-repository/my-plugin:latest
+   make push
    ```
-
-NOTE: If you have a Mac with Apple silicon, you will need to add the flag
-`--platform=linux/amd64` when building the image to target the correct platform
-to run in-cluster.
 
 ## Deployment on cluster
 
-A [Helm](https://helm.sh) chart is available to deploy the plugin to an OpenShift environment.
+To deploy on the cluster, can simply run the below command:
 
-The following Helm parameters are required:
-
-`plugin.image`: The location of the image containing the plugin that was previously pushed
-
-Additional parameters can be specified if desired. Consult the chart [values](charts/openshift-console-plugin/values.yaml) file for the full set of supported parameters.
-
-### Installing the Helm Chart
-
-Install the chart using the name of the plugin as the Helm release name into a new namespace or an existing namespace as specified by the `my-plugin-namespace` parameter and providing the location of the image within the `plugin.image` parameter by using the following command:
-
-```shell
-helm upgrade -i  my-plugin charts/openshift-console-plugin -n my-plugin-namespace --create-namespace --set plugin.image=my-plugin-image-location
+```bash
+oc apply -f manifest.yaml
 ```
-
-NOTE: When deploying on OpenShift 4.10, it is recommended to add the parameter `--set plugin.securityContext.enabled=false` which will omit configurations related to Pod Security.
 
 ## Linting
 
