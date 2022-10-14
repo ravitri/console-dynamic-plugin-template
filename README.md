@@ -74,16 +74,18 @@ push it to an image registry.
    make build
    ```
 
-2. Run the image:
-
-   ```sh
-   make run
-   ```
-
-3. Push the image:
+2. Push the image:
 
    ```sh
    make push
+   ```
+
+OR
+
+3. Build and Push the image:
+
+   ```sh
+   make build-push
    ```
 
 ## Deployment on cluster
