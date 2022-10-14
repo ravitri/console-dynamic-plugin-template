@@ -1,10 +1,9 @@
-FROM docker.io/library/node:16 AS build
+FROM registry.access.redhat.com/ubi9/nodejs-16:1-59.1665074152 AS build
 
 ADD . /usr/src/app
 WORKDIR /usr/src/app
-RUN yarn install && yarn build
+RUN npm install --location=global yarn && yarn install && yarn build
 
-FROM docker.io/library/nginx:stable
+FROM registry.access.redhat.com/ubi9/nginx-120:1-61.1665075998
 
-RUN chmod g+rwx /var/cache/nginx /var/run /var/log/nginx
 COPY --from=build /usr/src/app/dist /usr/share/nginx/html

@@ -28,7 +28,7 @@ spec:
         - name: console-dynamic-plugin-template
           image: quay.io/travi/console-dynamic-plugin-template:latest
           ports:
-            - containerPort: 9443
+            - containerPort: 8443
               protocol: TCP
           imagePullPolicy: Always
           volumeMounts:
@@ -74,7 +74,7 @@ data:
       default_type       application/octet-stream;
       keepalive_timeout  65;
       server {
-        listen              9443 ssl;
+        listen              8443 ssl;
         ssl_certificate     /var/serving-cert/tls.crt;
         ssl_certificate_key /var/serving-cert/tls.key;
         root                /usr/share/nginx/html;
@@ -95,10 +95,10 @@ metadata:
     app.kubernetes.io/part-of: console-dynamic-plugin-template
 spec:
   ports:
-    - name: 9443-tcp
+    - name: 8443-tcp
       protocol: TCP
-      port: 9443
-      targetPort: 9443
+      port: 8443
+      targetPort: 8443
   selector:
     app: console-dynamic-plugin-template
   type: ClusterIP
@@ -113,5 +113,5 @@ spec:
   service:
     name: console-dynamic-plugin-template
     namespace: console-dynamic-plugin-template
-    port: 9443
+    port: 8443
     basePath: '/'
